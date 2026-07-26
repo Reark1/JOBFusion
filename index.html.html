@@ -1,0 +1,1218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JOBFusion</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0b0f19;
+    --panel:#111827;
+    --panel-2:#1f293d;
+    --line:#2d3748;
+    --cyan:#00f2fe;
+    --cyan-dim:#008b99;
+    --blue:#4facfe;
+    --blue-dim:#215f93;
+    --purple:#7000ff;
+    --purple-dim:#430099;
+    --green:#00e676;
+    --yellow:#ffc107;
+    --white:#f8fafc;
+    --grey:#94a3b8;
+    --text-main:#f8fafc;
+    --radius:14px;
+    --glow-color: rgba(0, 242, 254, 0.25);
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box; transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg);
+    color:var(--text-main);
+    font-family:'Inter',sans-serif;
+    min-height:100vh;
+    overflow-x:hidden;
+    cursor:default;
+  }
+  h1,h2,h3,.brand{font-family:'Sora',sans-serif;}
+  h1{letter-spacing:-1px;}
+  h2{letter-spacing:-0.6px;}
+  h3{letter-spacing:-0.2px;}
+  .eyebrow{font-family:'Sora',sans-serif; font-weight:800; letter-spacing:2px; text-transform:uppercase;}
+  a{color:inherit;text-decoration:none;}
+  ::selection{background:var(--cyan);color:#0a0a0d;}
+
+  /* ===== ANIMATED BACKGROUND ===== */
+  .grid-bg{
+    position:fixed; inset:0; z-index:0; pointer-events:none;
+    background-image:radial-gradient(var(--glow-color) 1px, transparent 1px);
+    background-size:26px 26px;
+    mask-image:radial-gradient(ellipse 80% 60% at 50% 0%, #000 40%, transparent 100%);
+  }
+  .blob{
+    position:fixed; border-radius:50%; filter:blur(90px); z-index:0; pointer-events:none;
+    opacity:0.35;
+  }
+  .blob-cyan{
+    width:420px; height:420px; background:var(--cyan);
+    top:-120px; left:-100px;
+    animation:floatA 16s ease-in-out infinite;
+  }
+  .blob-blue{
+    width:480px; height:480px; background:var(--blue);
+    top:20%; right:-160px;
+    animation:floatB 20s ease-in-out infinite;
+  }
+  .blob-purple{
+    width:340px; height:340px; background:var(--purple);
+    bottom:-100px; left:20%;
+    opacity:0.25;
+    animation:floatC 18s ease-in-out infinite;
+  }
+  @keyframes floatA{
+    0%,100%{transform:translate(0,0) scale(1);}
+    50%{transform:translate(60px,80px) scale(1.15);}
+  }
+  @keyframes floatB{
+    0%,100%{transform:translate(0,0) scale(1);}
+    50%{transform:translate(-70px,60px) scale(1.1);}
+  }
+  @keyframes floatC{
+    0%,100%{transform:translate(0,0) scale(1);}
+    50%{transform:translate(50px,-40px) scale(1.2);}
+  }
+
+  .spotlight{
+    position:fixed; width:420px; height:420px; border-radius:50%;
+    background:radial-gradient(circle, var(--glow-color), transparent 70%);
+    pointer-events:none; z-index:1; transform:translate(-50%,-50%);
+    left:50%; top:50%; transition:left .12s linear, top .12s linear;
+  }
+
+  .page{position:relative; z-index:2; display:none; min-height:100vh; flex-direction:column;}
+  .page.active{display:flex;}
+  .fade-in{animation:fadeUp .7s ease both;}
+  @keyframes fadeUp{from{opacity:0; transform:translateY(14px);} to{opacity:1; transform:translateY(0);}}
+
+  /* NAV */
+  nav{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:18px 6%;
+    border-bottom:1px solid var(--line);
+    position:sticky; top:0; background:rgba(11,15,25,0.85);
+    backdrop-filter:blur(12px);
+    z-index:10;
+  }
+  
+  .brand{font-size:22px; font-weight:800; letter-spacing:-0.5px;}
+  .brand span{background:linear-gradient(90deg, var(--cyan), var(--blue)); -webkit-background-clip:text; background-clip:text; color:transparent;}
+  .nav-right-wrap{display:flex; align-items:center; gap:14px;}
+  .nav-links{display:flex; gap:25px; align-items:center;}
+  .nav-links a{font-size:14px; color:var(--grey); position:relative; transition:color .2s; padding-bottom:4px; font-weight:600;}
+  .nav-links a::after{
+    content:''; position:absolute; left:0; bottom:0; width:0; height:1.5px;
+    background:linear-gradient(90deg, var(--cyan), var(--blue)); transition:width .25s ease;
+  }
+  .nav-links a:hover{color:var(--text-main);}
+  .nav-links a:hover::after{width:100%;}
+
+  .btn{
+    font-family:'Inter',sans-serif; font-weight:700; font-size:14px;
+    padding:11px 22px; border-radius:999px; border:1px solid transparent;
+    cursor:pointer; transition:transform .15s ease, background .2s, border-color .2s, box-shadow .25s;
+    display:inline-flex; align-items:center; gap:8px; position:relative; overflow:hidden;
+  }
+  .btn:active{transform:scale(0.96);}
+  .btn-primary{background:linear-gradient(90deg, var(--cyan), var(--blue)); color:#0a0a0d;}
+  .btn-primary:hover{box-shadow:0 0 0 4px var(--glow-color), 0 8px 24px var(--glow-color); transform:translateY(-2px);}
+  .btn-ghost{border-color:var(--line); color:var(--text-main); background:transparent;}
+  .btn-ghost:hover{border-color:var(--cyan); color:var(--cyan); box-shadow:0 0 0 4px var(--glow-color);}
+  .ripple{
+    position:absolute; border-radius:50%; background:rgba(255,255,255,0.5);
+    transform:scale(0); animation:rippleAnim .55s ease-out forwards; pointer-events:none;
+  }
+  @keyframes rippleAnim{to{transform:scale(3); opacity:0;}}
+
+  /* HERO */
+  .hero{padding:100px 6% 60px; text-align:left; max-width:1100px;}
+  .eyebrow{
+    color:var(--cyan); font-size:13px; font-weight:800;
+    display:flex; align-items:center; gap:10px; margin-bottom:22px;
+  }
+  .dot-live{width:7px; height:7px; border-radius:50%; background:var(--cyan); animation:pulse 1.8s infinite;}
+  @keyframes pulse{
+    0%{box-shadow:0 0 0 0 var(--cyan);}
+    70%{box-shadow:0 0 0 9px rgba(0,242,254,0);}
+    100%{box-shadow:0 0 0 0 rgba(0,242,254,0);}
+  }
+  .hero h1{
+    font-size:clamp(38px, 5.2vw, 68px); line-height:1.06; font-weight:800; letter-spacing:-1px;
+    max-width:850px;
+  }
+  .hero h1 .accent{
+    background:linear-gradient(90deg, var(--cyan), var(--blue), var(--purple));
+    background-size:200% auto;
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    animation:shine 5s linear infinite;
+  }
+  @keyframes shine{to{background-position:200% center;}}
+  .hero p{margin-top:22px; font-size:17px; color:var(--grey); max-width:620px; line-height:1.7;}
+
+  /* NOTICE BADGE */
+  .partner-notice{
+    margin-top:20px; display:inline-flex; align-items:center; gap:9px; font-size:12.5px;
+    color:var(--text-main); background:linear-gradient(90deg, rgba(0,242,254,0.12), rgba(79,172,254,0.06));
+    border:1px solid rgba(0,242,254,0.35); padding:7px 15px; border-radius:999px; position:relative; overflow:hidden;
+    animation:badgeGlow 3s ease-in-out infinite alternate;
+  }
+  @keyframes badgeGlow {
+    0% { border-color: rgba(0,242,254,0.3); box-shadow: 0 0 10px rgba(0,242,254,0.1); }
+    100% { border-color: rgba(0,242,254,0.8); box-shadow: 0 0 20px rgba(0,242,254,0.25); }
+  }
+  .partner-notice::after {
+    content:''; position:absolute; top:0; left:-100%; width:50%; height:100%;
+    background:linear-gradient(90deg, transparent, rgba(0,242,254,0.4), transparent);
+    animation:shimmer 2.8s infinite;
+  }
+  @keyframes shimmer { 0% { left: -100%; } 60%, 100% { left: 160%; } }
+  .partner-notice .notice-tag{
+    background:var(--cyan); color:#0a0a0d; font-weight:800; font-size:10px;
+    padding:2px 7px; border-radius:5px; text-transform:uppercase; letter-spacing:0.5px;
+    position:relative; z-index:1;
+  }
+  .partner-notice span:not(.notice-tag){ position:relative; z-index:1; }
+  .partner-notice b{ color:var(--cyan); font-weight:700; }
+  .hero-actions{display:flex; gap:16px; margin-top:30px; flex-wrap:wrap;}
+
+  /* SERVICES */
+  .section{padding:70px 6%;}
+  .section-head{max-width:650px; margin-bottom:44px;}
+  .section-head .eyebrow{margin-bottom:14px; font-weight:800;}
+  .section-head h2{font-size:clamp(26px,3vw,38px); font-weight:800; letter-spacing:-1px;}
+  .section-head p{color:var(--grey); margin-top:12px; font-size:15px; line-height:1.7;}
+
+  .services-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:18px;}
+  @media(max-width:1000px){.services-grid{grid-template-columns:repeat(2,1fr);}}
+  @media(max-width:600px){.services-grid{grid-template-columns:1fr;}}
+  .service-card{
+    background:var(--panel); border:1px solid var(--line); border-radius:var(--radius);
+    padding:26px; transition:border-color .25s, transform .2s, box-shadow .3s;
+  }
+  .service-card:hover{border-color:var(--cyan-dim); box-shadow:0 14px 30px var(--glow-color); transform:translateY(-3px);}
+  .service-icon{
+    width:38px; height:38px; border-radius:10px; margin-bottom:16px;
+    background:linear-gradient(135deg, rgba(0,242,254,0.18), rgba(79,172,254,0.18));
+    border:1px solid var(--line);
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Sora',sans-serif; font-weight:800; font-size:14px; color:var(--cyan);
+  }
+  .service-card h3{font-size:17px; margin-bottom:10px; font-weight:800; color:var(--text-main);}
+  .service-card p{color:var(--grey); font-size:14px; line-height:1.6;}
+
+  /* HOW IT WORKS */
+  .steps{display:flex; flex-direction:column; gap:0; max-width:750px;}
+  .step{display:flex; gap:22px; padding:24px 0; border-bottom:1px solid var(--line); transition:padding-left .25s;}
+  .step:hover{padding-left:10px;}
+  .step:last-child{border-bottom:none;}
+  .step-mark{font-family:'Sora',sans-serif; color:var(--cyan); font-weight:800; font-size:18px; min-width:34px;}
+  .step h3{font-size:18px; margin-bottom:6px; font-weight:800; color:var(--text-main);}
+  .step p{color:var(--grey); font-size:14.5px; line-height:1.6;}
+
+  /* REVIEWS SECTION */
+  .reviews-section{padding:70px 6%;}
+  .reviews-wrapper{
+    display:grid; grid-template-columns:1fr 1.6fr; gap:40px; align-items:start; max-width:1200px; margin:0 auto;
+  }
+  @media(max-width:900px){.reviews-wrapper{grid-template-columns:1fr; gap:30px;}}
+
+  .reviews-header-left{display:flex; flex-direction:column; align-items:flex-start; text-align:left;}
+  .reviews-header-left .eyebrow{font-size:13px; font-weight:800; color:var(--cyan); margin-bottom:10px;}
+  .reviews-header-left h2{font-size:clamp(28px, 3.5vw, 40px); font-weight:800; letter-spacing:-1px;}
+  
+  .rating-badge{
+    display:inline-flex; flex-direction:column; align-items:flex-start; gap:6px;
+    margin-top:20px; font-size:15px; font-weight:700; color:var(--text-main);
+    background:var(--panel); border:1px solid var(--line); padding:18px 24px; border-radius:var(--radius);
+  }
+  .rating-score{font-family:'Sora',sans-serif; font-size:26px; font-weight:800; color:var(--cyan);}
+  .rating-stars{color:var(--yellow); font-size:18px; letter-spacing:2px;}
+
+  .reviews-grid-right{display:flex; flex-direction:column; gap:20px;}
+  
+  .review-card{
+    background:var(--panel); border:1px solid var(--line); border-radius:var(--radius);
+    padding:24px; position:relative; transition:transform .3s, border-color .3s, box-shadow .3s;
+  }
+  .review-card:hover{transform:translateY(-3px); border-color:var(--cyan); box-shadow:0 12px 30px var(--glow-color);}
+  .review-card-top{display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px;}
+  .user-info{display:flex; align-items:center; gap:14px;}
+  
+  .user-avatar{
+    width:46px; height:46px; border-radius:50%; background:var(--panel-2);
+    color:var(--cyan); font-weight:800; display:flex; align-items:center; justify-content:center;
+    font-size:20px; border:1px solid var(--cyan-dim); flex-shrink:0;
+  }
+  .user-details h4{font-size:16px; font-weight:800; color:var(--text-main);}
+  .user-role{font-size:12px; color:var(--cyan); font-weight:600; margin-top:2px;}
+  .post-time{font-size:11px; color:var(--grey); margin-top:3px;}
+
+  .user-badge{
+    display:inline-block; font-size:10px; font-weight:800; color:var(--cyan);
+    background:rgba(0,242,254,0.1); border:1px solid rgba(0,242,254,0.3);
+    padding:3px 10px; border-radius:999px; text-transform:uppercase; letter-spacing:0.5px;
+    white-space:nowrap;
+  }
+
+  .review-card p{font-size:14.5px; color:var(--grey); line-height:1.6; font-style:italic;}
+
+  .review-actions{
+    margin-top:14px; display:flex; justify-content:flex-end; align-items:center;
+    border-top:1px solid var(--line); padding-top:10px;
+  }
+  .delete-btn{
+    background:transparent; border:none; color:#ff6b6b; font-size:12px; font-weight:700;
+    cursor:pointer; transition:color .2s; display:inline-flex; align-items:center; gap:4px;
+  }
+  .delete-btn:hover{color:#ff4d4d; text-decoration:underline;}
+
+  /* PLATFORM NUMBERS */
+  .numbers-section{padding:50px 6% 60px; text-align:center;}
+  .numbers-title{font-size:32px; font-weight:800; color:var(--text-main); margin-bottom:28px;}
+  .numbers-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:20px; max-width:1100px; margin:0 auto; }
+  @media(max-width:900px){.numbers-grid{grid-template-columns:repeat(2,1fr);}}
+  @media(max-width:520px){.numbers-grid{grid-template-columns:1fr;}}
+  .num-card{
+    background:var(--panel); border:1px solid var(--line); border-radius:var(--radius);
+    padding:30px 20px; transition:border-color .3s, transform .3s, box-shadow .3s;
+    border-top:4px solid var(--cyan); text-align:center;
+  }
+  .num-card:hover{transform:translateY(-4px); border-color:var(--cyan-dim); box-shadow:0 14px 28px var(--glow-color);}
+  .num-card:nth-child(2){border-top-color:var(--blue);}
+  .num-card:nth-child(3){border-top-color:var(--purple);}
+  .num-card:nth-child(4){border-top-color:var(--green);}
+  .num-card b{
+    display:block; font-family:'Sora',sans-serif; font-size:38px; font-weight:800;
+    background:linear-gradient(90deg, var(--cyan), var(--blue));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .num-card span{font-size:13px; font-weight:700; color:var(--grey); margin-top:8px; display:block; text-transform:uppercase; letter-spacing:0.5px;}
+
+  /* CTA BAND */
+  .cta-band{
+    margin:40px 6% 0; padding:50px 6%; border-radius:20px;
+    background:linear-gradient(135deg, var(--panel), var(--panel-2));
+    border:1px solid var(--cyan-dim);
+    display:flex; align-items:center; justify-content:space-between; gap:24px; flex-wrap:wrap;
+    position:relative; overflow:hidden;
+    box-shadow: 0 10px 30px var(--glow-color);
+  }
+  .cta-band h2{font-size:28px; font-weight:800; max-width:420px; color:var(--text-main);}
+  .cta-band p{color:var(--grey); font-size:14px; margin-top:8px; max-width:420px;}
+
+  /* SECTION SEPARATOR */
+  .section-divider {
+    margin: 40px 6%;
+    border: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--cyan-dim), transparent);
+    opacity: 0.6;
+  }
+
+  /* FOOTER */
+  footer{
+    margin-top:auto; padding:30px 6%; border-top:1px solid var(--line);
+    display:flex; flex-direction:column; gap:20px;
+  }
+  .footer-top{
+    display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;
+  }
+  .footer-right-block{
+    display:flex; flex-direction:column; align-items:flex-end; text-align:right; gap:6px;
+  }
+  @media(max-width:600px){
+    .footer-right-block{align-items:flex-start; text-align:left;}
+  }
+
+  .footer-credit{font-size:13px; color:var(--grey); display:inline-flex; align-items:center; gap:8px;}
+  .footer-credit b{color:var(--cyan); font-weight:700;}
+  .copyright-badge{
+    width:20px; height:20px; border-radius:50%; border:1.4px solid var(--cyan);
+    display:flex; align-items:center; justify-content:center;
+    font-size:11px; font-weight:800; color:var(--cyan); font-family:'Sora',sans-serif;
+  }
+
+  .social-simple-links{
+    display:flex; align-items:center; gap:14px; font-size:12.5px; color:var(--grey); font-weight:600;
+  }
+  .social-simple-links a{
+    color:var(--cyan); transition:color .2s, text-decoration .2s; display:inline-flex; align-items:center; gap:4px;
+  }
+  .social-simple-links a:hover{
+    color:var(--text-main); text-decoration:underline;
+  }
+
+  /* EVENT BANNER */
+  .event-banner{
+    display:flex; align-items:center; gap:16px; flex-wrap:wrap;
+    padding:16px 20px; border-radius:var(--radius);
+    background:var(--panel); border:1px solid var(--line);
+    position:relative; overflow:hidden;
+  }
+  .event-badge{
+    flex-shrink:0; font-family:'Sora',sans-serif; font-weight:800; font-size:11px;
+    letter-spacing:1px; text-transform:uppercase; color:#0a0a0d;
+    background:linear-gradient(90deg, var(--cyan), var(--blue));
+    padding:6px 14px; border-radius:999px; white-space:nowrap;
+  }
+  .event-info{flex:1; min-width:220px;}
+  .event-info h3{font-size:15px; font-weight:800; margin-bottom:6px; color:var(--text-main);}
+  .event-meta{display:flex; gap:12px; flex-wrap:wrap;}
+  .event-meta span{
+    font-size:12px; color:var(--grey); display:flex; align-items:center; gap:6px; font-weight:600;
+  }
+
+  /* AUTH & DASHBOARD */
+  .auth-wrap{flex:1; display:flex; align-items:center; justify-content:center; padding:60px 6%;}
+  .auth-card{
+    width:100%; max-width:400px; background:var(--panel); border:1px solid var(--line);
+    border-radius:var(--radius); padding:38px 32px; position:relative; overflow:hidden;
+    box-shadow: 0 10px 30px var(--glow-color);
+  }
+  .auth-tabs{display:flex; background:var(--panel-2); border-radius:999px; padding:4px; margin-bottom:28px;}
+  .auth-tab{
+    flex:1; text-align:center; padding:9px 0; border-radius:999px; cursor:pointer;
+    font-size:13px; font-weight:700; color:var(--grey); transition:all .2s;
+  }
+  .auth-tab.active{background:linear-gradient(90deg, var(--cyan), var(--blue)); color:#0a0a0d;}
+  .auth-card h2{font-size:22px; font-weight:800; margin-bottom:6px; color:var(--text-main);}
+  .auth-card > p{color:var(--grey); font-size:13px; margin-bottom:26px;}
+  .field{margin-bottom:16px;}
+  .field label{display:block; font-size:12px; color:var(--grey); margin-bottom:7px; font-weight:600;}
+  .field input{
+    width:100%; padding:12px 14px; background:var(--panel-2); border:1px solid var(--line);
+    border-radius:999px; color:var(--text-main); font-size:14px; font-family:'Inter',sans-serif;
+    transition:border-color .2s;
+  }
+  .field input:focus{outline:none; border-color:var(--cyan);}
+  .auth-submit{width:100%; justify-content:center; margin-top:8px; padding:13px;}
+  .auth-note{text-align:center; font-size:12px; color:var(--grey); margin-top:18px;}
+  .error-msg{color:#ff6b6b; font-size:12px; margin-top:-8px; margin-bottom:14px; display:none;}
+
+  .dash{display:none; flex:1; flex-direction:column;}
+  .dash.active{display:flex;}
+  .dash-header{padding:44px 6% 24px;}
+  .dash-header h1{font-size:clamp(26px,3.4vw,38px); font-weight:800; letter-spacing:-1px; color:var(--text-main);}
+  .dash-header .accent{
+    background:linear-gradient(90deg, var(--cyan), var(--blue));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .dash-header p{color:var(--grey); margin-top:10px; font-size:14px;}
+
+  /* WELCOME BAR */
+  .welcome-bar{
+    margin:0 6% 35px; padding:16px 22px; background:var(--panel);
+    border:1px solid var(--line); border-radius:14px;
+    display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;
+  }
+  .welcome-bar span{font-size:14px; color:var(--grey);}
+  .welcome-bar b{color:var(--cyan); font-weight:800;}
+  .welcome-actions{display:flex; align-items:center; gap:12px;}
+
+  /* SITE INTRO PARAGRAPH */
+  .site-intro-paragraph{
+    margin:0 6% 30px; font-size:15px; color:var(--grey); line-height:1.7;
+  }
+  .site-intro-paragraph ul{
+    margin-top:12px; padding-left:20px; list-style-type:disc;
+  }
+  .site-intro-paragraph li{
+    margin-bottom:8px; color:var(--text-main); font-size:14.5px;
+  }
+  .site-intro-paragraph li b{
+    color:var(--cyan);
+  }
+
+  .company-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:20px; padding:0 6% 30px;}
+  @media(max-width:1000px){.company-grid{grid-template-columns:repeat(2,1fr);}}
+  @media(max-width:640px){.company-grid{grid-template-columns:1fr;}}
+
+  .company-card{
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-top: 3px solid var(--cyan);
+    border-radius: var(--radius);
+    padding: 24px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  }
+  .company-card:hover{
+    border-color: var(--cyan);
+    transform: translateY(-5px);
+    box-shadow: 0 12px 28px var(--glow-color);
+  }
+
+  .company-top{display:flex; align-items:center; gap:14px; margin-bottom:14px;}
+  .company-img-wrap{
+    width:48px; height:48px; border-radius:12px; background:#fff; padding:6px;
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 0 12px var(--glow-color); border:1px solid var(--line); flex-shrink:0;
+  }
+  .company-img-wrap img{width:100%; height:100%; object-fit:contain;}
+
+  .company-name{font-size:17px; font-weight:800; color:var(--text-main);}
+  .company-open{font-size:11px; color:var(--grey); display:flex; align-items:center; gap:6px; margin-top:3px; font-weight:600;}
+  
+  .company-about{
+    font-size:13px; color:var(--grey); line-height:1.6; margin-bottom:16px;
+    background:var(--panel-2); padding:10px 12px; border-radius:8px;
+    border-left:2px solid var(--cyan); min-height:80px;
+  }
+
+  .vacancy-toggle{
+    font-size:13px; color:var(--cyan); font-weight:800;
+    display:flex; align-items:center; justify-content:space-between;
+    background:rgba(0,242,254,0.06); padding:8px 12px; border-radius:8px;
+  }
+  .chevron{transition:transform .25s;}
+  .company-card.open .chevron{transform:rotate(180deg);}
+
+  .vacancy-list{max-height:0; overflow:hidden; transition:max-height .3s ease;}
+  .company-card.open .vacancy-list{max-height:400px; margin-top:14px;}
+  .vacancy-item{display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-top:1px solid var(--line); gap:10px;}
+  .vacancy-item .vac-info b{font-size:13px; display:block; color:var(--text-main); font-weight:700;}
+  .vacancy-item .vac-info span{font-size:11px; color:var(--grey);}
+  .apply-link{
+    font-size:11px; font-weight:800; color:#0a0a0d; background:linear-gradient(90deg, var(--cyan), var(--blue));
+    padding:6px 14px; border-radius:999px; white-space:nowrap; transition:transform .2s; cursor:pointer;
+  }
+  .apply-link:hover{transform:translateY(-2px);}
+
+  .shifted-metrics-section{
+    margin:10px 6% 40px; padding:28px 20px;
+    background:var(--panel); border:1px solid var(--line); border-radius:var(--radius);
+  }
+  .shifted-metrics-grid{
+    display:grid; grid-template-columns:repeat(3,1fr); gap:18px; text-align:center;
+  }
+  @media(max-width:640px){.shifted-metrics-grid{grid-template-columns:1fr; gap:14px;}}
+  .shifted-metric-card{
+    background:var(--panel-2); border:1px solid var(--line); border-radius:12px; padding:20px 14px;
+  }
+  .shifted-metric-card b{
+    display:block; font-family:'Sora',sans-serif; font-size:32px; font-weight:800; color:var(--cyan);
+  }
+  .shifted-metric-card span{
+    font-size:12px; font-weight:700; color:var(--grey); margin-top:6px; display:block; text-transform:uppercase; letter-spacing:0.5px;
+  }
+
+  .opinion-section{
+    margin:0 6% 60px; padding:28px; background:var(--panel);
+    border:1px solid var(--line); border-radius:var(--radius);
+  }
+  .opinion-section h3{font-size:18px; font-weight:800; margin-bottom:6px; color:var(--cyan);}
+  .opinion-section p{font-size:13px; color:var(--grey); margin-bottom:18px;}
+  .opinion-form{display:flex; flex-direction:column; gap:12px;}
+  .opinion-input{
+    width:100%; padding:14px; background:var(--panel-2); border:1px solid var(--line);
+    border-radius:10px; color:var(--text-main); font-family:'Inter',sans-serif; font-size:13.5px; resize:none;
+  }
+  .opinion-input:focus{outline:none; border-color:var(--cyan);}
+
+  /* MODAL */
+  .modal-overlay{
+    position:fixed; inset:0; background:rgba(11,15,25,0.85); backdrop-filter:blur(8px);
+    z-index:100; display:none; align-items:center; justify-content:center; padding:20px;
+  }
+  .modal-overlay.active{display:flex;}
+  .profile-modal{
+    background:var(--panel); border:1px solid var(--cyan); border-radius:20px;
+    padding:32px; width:100%; max-width:380px; text-align:center; position:relative;
+    box-shadow:0 0 30px var(--glow-color);
+  }
+  .close-modal{
+    position:absolute; top:16px; right:18px; font-size:18px; color:var(--grey); cursor:pointer;
+  }
+  .close-modal:hover{color:var(--text-main);}
+  .profile-img-lg{
+    width:84px; height:84px; border-radius:50%; margin:0 auto 16px;
+    background:var(--panel-2); border:2px solid var(--cyan);
+    display:flex; align-items:center; justify-content:center; font-size:36px; color:var(--cyan);
+  }
+  .profile-modal h3{font-size:18px; font-weight:800; margin-bottom:4px; color:var(--text-main);}
+  .profile-modal p{font-size:13px; color:var(--grey); margin-bottom:18px;}
+  .profile-badge{
+    display:inline-block; font-size:11px; font-weight:800; color:#0a0a0d;
+    background:var(--cyan); padding:4px 12px; border-radius:999px; text-transform:uppercase;
+  }
+
+  .logout-link{font-size:12px; font-weight:700; color:var(--grey); border:1px solid var(--line); padding:7px 14px; border-radius:999px; transition:.2s;}
+  .logout-link:hover{color:var(--text-main); border-color:var(--cyan);}
+
+  @media(max-width:700px){
+    nav .nav-links{display:none;}
+    .cta-band{flex-direction:column; align-items:flex-start;}
+    .event-banner{flex-direction:column; align-items:flex-start;}
+  }
+</style>
+</head>
+<body>
+<div class="grid-bg"></div>
+<div class="blob blob-cyan"></div>
+<div class="blob blob-blue"></div>
+<div class="blob blob-purple"></div>
+<div class="spotlight" id="spotlight"></div>
+
+<!-- PROFILE MODAL -->
+<div class="modal-overlay" id="profileModal">
+  <div class="profile-modal">
+    <div class="close-modal" onclick="toggleProfileModal(false)">✕</div>
+    <div class="profile-img-lg">👤</div>
+    <h3 id="modal-user-name">User Name</h3>
+    <p id="modal-user-email">user@example.com</p>
+    <span class="profile-badge">Verified Applicant</span>
+    <div style="margin-top:20px;">
+      <button class="btn btn-ghost" onclick="doLogout(); toggleProfileModal(false);" style="width:100%; justify-content:center;">LOGOut</button>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 1: LANDING -->
+<div class="page active" id="page-landing">
+  <nav>
+    <div class="brand">JOB<span>Fusion</span></div>
+    <div class="nav-right-wrap">
+      <div class="nav-links">
+        <a href="#services">Services</a>
+        <a href="#how">How it works</a>
+        <a href="#reviews">Reviews</a>
+        <a href="#numbers">Numbers</a>
+      </div>
+      <button class="btn btn-primary" onclick="goTo('page-auth')">LOGIn / SIGNUp</button>
+    </div>
+  </nav>
+
+  <section class="hero fade-in">
+    <div class="eyebrow"><span class="dot-live"></span> 10+ Companies · LIVE Openings In One Place</div>
+    <h1>Track All Open <span class="accent">Roles</span><br>In <span class="accent">One</span> Dashboard.</h1>
+    <p> Find Top Tech Jobs in one place. Explore opening accross 10+ industry leaders and apply directly with a single click. No Extra Tabs,No Hassle.</p>
+    
+    <div class="partner-notice">
+      <span class="notice-tag">Notice</span>
+      <span>Apply via JOBFusion for VERIFIED <b>PARTNER Label</b> &amp; Priority Hiring.</span>
+    </div>
+
+    <div class="hero-actions">
+      <button class="btn btn-primary" onclick="goTo('page-auth')">Explore vacancies →</button>
+      <a class="btn btn-ghost" href="#services">See what's included</a>
+    </div>
+  </section>
+
+  <!-- SERVICES -->
+  <section class="section" id="services">
+    <div class="section-head">
+      <div class="eyebrow">WHAT JOBFusion DOES !</div>
+      <h2><b>Built for one job — getting you to the right opening, fast.</b></h2>
+      <p>Here's exactly what's available to you before and after you sign in.</p>
+    </div>
+    <div class="services-grid">
+      <div class="service-card">
+        <div class="service-icon">01</div>
+        <h3>Company SHORTLIST !</h3>
+        <p>10+ Hand-picked companies with active hiring, shown with a short "about" so you know who you're applying to.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">02</div>
+        <h3>Live VACANCY View !</h3>
+        <p>Open a company card to see which posts are currently vacant — role, level, and location at a glance.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">03</div>
+        <h3>One-Click Redirect !</h3>
+        <p>Tap apply on any vacancy and you're taken straight to that company's official careers page — nothing fake, nothing in between.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">04</div>
+        <h3>Simple Account ACCESS</h3>
+        <p>A quick login or sign up unlocks the full dashboard. No resume upload, no spam — just access to listings.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">05</div>
+        <h3>Always FREE !</h3>
+        <p>No subscriptions, no hidden charges. JobFusion is built to be a free, student-friendly bridge to real openings.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="section" id="how">
+    <div class="section-head">
+      <div class="eyebrow">HOW IT WORKS !</div>
+      <h2><b>Three steps, then you're browsing real openings.</b></h2>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-mark">01</div>
+        <div>
+          <h3><b>Sign In or Create an Account</b></h3>
+          <p>Use the login/sign up page — it takes a few seconds and unlocks the dashboard.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-mark">02</div>
+        <div>
+          <h3><b>Pick a Company You're Interested In</b></h3>
+          <p>Read the detailed about note, then open the card to see current vacancies.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-mark">03</div>
+        <div>
+          <h3><b>Apply on the Official Site</b></h3>
+          <p>Click a vacancy and JobFusion redirects you instantly to that company's real careers page to apply.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- REVIEWS SECTION -->
+  <section class="reviews-section" id="reviews">
+    <div class="reviews-wrapper">
+      
+      <!-- LEFT SIDE: TITLE & RATING -->
+      <div class="reviews-header-left">
+        <div class="eyebrow">USERS &amp; PARTNER REVIEWS</div>
+        <h2><b>WHAT APPLICANTS SAY ABOUT JOBFusion</b></h2>
+        
+        <div class="rating-badge">
+          <span class="rating-score">4.9 / 5.0 Rating</span>
+          <span class="rating-stars">★★★★★</span>
+          <span style="color:var(--grey); font-size:13px; font-weight:600; margin-top:4px;" id="totalReviewsCount">(2+ Reviews)</span>
+        </div>
+      </div>
+
+      <!-- RIGHT SIDE: REVIEWS CONTAINER -->
+      <div class="reviews-grid-right" id="reviewsContainer">
+        <!-- Reviews will appear here -->
+      </div>
+
+    </div>
+  </section>
+
+  <!-- NUMBERS SECTION -->
+  <section class="numbers-section" id="numbers">
+    <h2 class="numbers-title"> OUR USERS COMPANYS &amp; VACANCIES</h2>
+    <div class="numbers-grid">
+      <div class="num-card"><b class="counter" data-target="10+">0</b><span>Companies Listed</span></div>
+      <div class="num-card"><b class="counter" data-target="30">0</b><span>Open Vacancies</span></div>
+      <div class="num-card"><b class="counter" data-target="2+" data-suffix="+">0</b><span>Registered Users</span></div>
+      <div class="num-card"><b class="counter" data-target="100" data-suffix="%">0</b><span>Official Redirects</span></div>
+    </div>
+  </section>
+
+  <!-- CTA BAND -->
+  <div class="cta-band">
+    <div>
+      <h2>Ready to See Who's Hiring?</h2>
+      <p>Sign in to unlock all 10+ companies and their current openings.</p>
+    </div>
+    <button class="btn btn-primary" onclick="goTo('page-auth')">LET's Go→</button>
+  </div>
+
+  <!-- GAP & DIVIDER LINE -->
+  <hr class="section-divider">
+
+  <footer>
+    <div class="footer-top">
+      <div class="brand" style="font-size:18px;">JOB<span>Fusion</span></div>
+
+      <div class="footer-right-block">
+        <div class="footer-credit"><span class="copyright-badge">C</span> Founded &amp; Created BY <b>REHAN PROJECTS</b></div>
+        <div class="social-simple-links">
+          <span>Instagram: <a href="https://instagram.com/your_username" target="_blank">@rehanofficia1</a></span>
+          <span>•</span>
+          <span>GitHub: <a href="https://github.com/your_username" target="_blank">http://github.com/Reark1</a></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="event-banner">
+      <div class="event-badge">🎓 Upcoming Event</div>
+      <div class="event-info">
+        <h3>Project On Skill ENHANCEMENT</h3>
+        <div class="event-meta">
+          <span>📅 15 August 2026-27</span>
+          <span>📍 MGM's College of CS &amp; IT, Nanded</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<!-- PAGE 2: AUTH + DASHBOARD -->
+<div class="page" id="page-auth">
+  <nav>
+    <div class="brand">JOB<span>Fusion</span></div>
+    <div class="nav-right-wrap">
+      <button class="btn btn-ghost" onclick="goTo('page-landing')">← Back home</button>
+    </div>
+  </nav>
+
+  <div class="auth-wrap" id="auth-wrap">
+    <div class="auth-card fade-in">
+      <div class="auth-tabs">
+        <div class="auth-tab active" id="tab-login" onclick="switchTab('login')">LOGIn</div>
+        <div class="auth-tab" id="tab-signup" onclick="switchTab('signup')">SIGNUp</div>
+      </div>
+
+      <div id="form-login">
+        <h2>Welcome Back</h2>
+        <p></p>
+        <div class="field"><label>Email</label><input type="email" id="login-email" placeholder="you@example.com"></div>
+        <div class="field"><label>Password</label><input type="password" id="login-pass" placeholder="••••••••"></div>
+        <div class="error-msg" id="login-error">Please fill in both fields.</div>
+        <button class="btn btn-primary auth-submit" onclick="doLogin()">LOGIn</button>
+        <div class="auth-note">New here? <a href="#" style="color:var(--cyan);" onclick="switchTab('signup');return false;">Create an account</a></div>
+      </div>
+
+      <div id="form-signup" style="display:none;">
+        <h2>Create your account</h2>
+        <p></p>
+        <div class="field"><label>Full name</label><input type="text" id="signup-name" placeholder="Your name"></div>
+        <div class="field"><label>Email</label><input type="email" id="signup-email" placeholder="you@example.com"></div>
+        <div class="field"><label>Password</label><input type="password" id="signup-pass" placeholder="Create a password"></div>
+        <div class="error-msg" id="signup-error">Please fill in all fields.</div>
+        <button class="btn btn-primary auth-submit" onclick="doSignup()">SIGNUp</button>
+        <div class="auth-note">Already have an account? <a href="#" style="color:var(--cyan);" onclick="switchTab('login');return false;">Log in</a></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dash" id="dashboard">
+    <div class="dash-header fade-in">
+      <h1>OPEN Roles Across <span class="accent">10+ Companies</span></h1>
+      <p>PICK a Company To See Vacancies. Applying Takes You To Their OFFICIAL Careers page.</p>
+      
+      <div class="partner-notice" style="margin-top:14px;">
+        <span class="notice-tag">Notice</span>
+        <span> Apply via JOBFusion for verified <b>PARTNER Label</b> &amp; Priority Hiring.</span>
+      </div>
+    </div>
+
+    <!-- WELCOME BAR -->
+    <div class="welcome-bar">
+      <span>WELCOME babs <b id="user-display">you</b></span>
+      <div class="welcome-actions">
+        <button class="btn btn-ghost" onclick="toggleProfileModal(true)" style="padding:6px 14px; font-size:12px;">👤 View Profile</button>
+        <a href="#" class="logout-link" onclick="doLogout();return false;">LOGOut</a>
+      </div>
+    </div>
+
+    <!-- INTRO PARAGRAPH -->
+    <div class="site-intro-paragraph fade-in">
+      JOBFusion is designed to make your tech career journey smooth, simple, and direct. By connecting candidates with verified enterprise hiring channels, we remove hassle and provide a clear path to career growth.
+      <ul>
+        <li><b>Verified Top Companies:</b> We partner with top-tier organizations to bring you authentic and active openings.</li>
+        <li><b>Direct &amp; Free Access:</b> Enjoy 100% free access to official career page redirects with no middleman agencies involved.</li>
+      </ul>
+    </div>
+
+    <!-- COMPANY GRID -->
+    <div class="company-grid" id="company-grid"></div>
+
+    <!-- METRICS BLOCK -->
+    <div class="shifted-metrics-section">
+      <div class="shifted-metrics-grid">
+        <div class="shifted-metric-card">
+          <b>10+</b>
+          <span>Companies Listed</span>
+        </div>
+        <div class="shifted-metric-card">
+          <b>30</b>
+          <span>Open Vacancies</span>
+        </div>
+        <div class="shifted-metric-card">
+          <b>2+</b>
+          <span>Registered Users</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- OPINION POST SECTION -->
+    <div class="opinion-section">
+      <h3>💬 Share Your Opinion</h3>
+      <p>How has your experience been using JOBFusion? Post your feedback below!</p>
+      <div class="opinion-form">
+        <textarea class="opinion-input" id="opinion-text" rows="3" placeholder="Write your review or thoughts here..."></textarea>
+        <div>
+          <button class="btn btn-primary" onclick="submitOpinion()">Post </button>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <div class="footer-top">
+        <div class="brand" style="font-size:18px;">JOB<span>Fusion</span></div>
+        <div class="footer-right-block">
+          <div class="footer-credit"><span class="copyright-badge">C</span> Founded &amp; Created BY <b>REHAN PROJECTS</b></div>
+          <div class="social-simple-links">
+            <span>Instagram: <a href="https://instagram.com/your_username" target="_blank">@rehanofficia1</a></span>
+            <span>•</span>
+            <span>GitHub: <a href="https://github.com/your_username" target="_blank">http://github.com/Reark1</a></span>
+          </div>
+        </div>
+      </div>
+      <div class="event-banner">
+        <div class="event-badge">🎓 Upcoming Event</div>
+        <div class="event-info">
+          <h3>Project On SKILL ENHANCEMENT</h3>
+          <div class="event-meta">
+            <span>📅 15 August 2026-27</span>
+            <span>📍 MGM's College of CS &amp; IT, Nanded</span>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </div>
+</div>
+
+<script>
+  let currentUser = {
+    name: "User",
+    email: "user@example.com"
+  };
+
+  const initialDefaultReviews = [
+    {
+      id: "def-1",
+      name: "kiran Manhotra",
+      role: "Software Development Engineer",
+      time: "Posted on 10 July 2026",
+      stars: "★★★★★",
+      text: "JOBFusion clean interface saved me hours of hopping between different company career portals. I applied directly to TCS and Google in just two clicks!",
+      isDefault: true
+    },
+    {
+      id: "def-2",
+      name: "Monika shinde",
+      role: "Frontend Software Developer",
+      time: "Posted on 18 July 2026",
+      stars: "★★★★",
+      text: "Super simple platform without fake job postings. Every single vacancy link redirects directly to official hiring portals.",
+      isDefault: true
+    }
+  ];
+
+  const companies = [
+    { 
+      name:"Google", domain:"google.com", 
+      about:"Global tech giant dominating Search, Cloud, and AI. Offers high-growth engineering, research, and product design roles with world-class work culture.", 
+      url:"https://careers.google.com/",
+      vacancies:[{title:"Software Engineer II", meta:"Bengaluru · Full-time"},{title:"Cloud Solutions Architect", meta:"Hyderabad · Full-time"},{title:"UX Researcher", meta:"Remote · Full-time"}] 
+    },
+    { 
+      name:"Microsoft", domain:"microsoft.com", 
+      about:"Leader in enterprise software, Azure cloud computing, and AI integration. Focuses on large-scale systems engineering and enterprise solutions.", 
+      url:"https://careers.microsoft.com/",
+      vacancies:[{title:"Azure DevOps Engineer", meta:"Hyderabad · Full-time"},{title:"Program Manager, AI", meta:"Bengaluru · Full-time"},{title:"Support Engineer", meta:"Noida · Full-time"}] 
+    },
+    { 
+      name:"Amazon", domain:"amazon.com", 
+      about:"Global e-commerce & cloud computing leader (AWS). Massive hiring for distributed systems, logistics technology, and cloud architecture.", 
+      url:"https://www.amazon.jobs/",
+      vacancies:[{title:"SDE-1 Backend", meta:"Chennai · Full-time"},{title:"Operations Manager", meta:"Mumbai · Full-time"},{title:"AWS Cloud Support Associate", meta:"Bengaluru · Full-time"}] 
+    },
+    { 
+      name:"TCS", domain:"tcs.com", 
+      about:"Tata Consultancy Services is India's top IT services multinational. Excellent entry-level software, consulting, and system engineering programs.", 
+      url:"https://www.tcs.com/careers",
+      vacancies:[{title:"Associate Software Engineer", meta:"Pune · Full-time"},{title:"Business Analyst", meta:"Kolkata · Full-time"},{title:"System Engineer", meta:"Chennai · Full-time"}] 
+    },
+    { 
+      name:"Infosys", domain:"infosys.com", 
+      about:"Global digital services and next-generation consulting leader. Known for extensive developer training and digital transformation projects.", 
+      url:"https://www.infosys.com/careers/",
+      vacancies:[{title:"Systems Engineer Trainee", meta:"Mysuru · Full-time"},{title:"Power Programmer", meta:"Pune · Full-time"},{title:"Test Engineer", meta:"Bengaluru · Full-time"}] 
+    },
+    { 
+      name:"Wipro", domain:"wipro.com", 
+      about:"Leading technology services and consulting company focusing on cloud, cybersecurity, robotics, and digital business operations.", 
+      url:"https://careers.wipro.com/",
+      vacancies:[{title:"Project Engineer", meta:"Bengaluru · Full-time"},{title:"Data Analyst", meta:"Hyderabad · Full-time"},{title:"Network Engineer", meta:"Chennai · Full-time"}] 
+    },
+    { 
+      name:"Accenture", domain:"accenture.com", 
+      about:"Fortune Global 500 professional services enterprise specializing in strategy, consulting, digital transformation, and cloud security.", 
+      url:"https://www.accenture.com/in-en/careers",
+      vacancies:[{title:"Application Development Analyst", meta:"Gurugram · Full-time"},{title:"Consulting Analyst", meta:"Mumbai · Full-time"},{title:"Security Analyst", meta:"Pune · Full-time"}] 
+    },
+    { 
+      name:"HCLTech", domain:"hcltech.com", 
+      about:"Next-generation global technology company helping enterprises reimagine their businesses through digital and engineering innovations.", 
+      url:"https://www.hcltech.com/careers",
+      vacancies:[{title:"Graduate Engineer Trainee", meta:"Noida · Full-time"},{title:"Cloud Engineer", meta:"Chennai · Full-time"},{title:"QA Engineer", meta:"Bengaluru · Full-time"}] 
+    },
+    { 
+      name:"Cognizant", domain:"cognizant.com", 
+      about:"Major multinational provider of IT, consulting, and business process outsourcing with deep focus on modernizing healthcare & financial tech.", 
+      url:"https://careers.cognizant.com/",
+      vacancies:[{title:"Programmer Analyst", meta:"Kolkata · Full-time"},{title:"Business Consultant", meta:"Pune · Full-time"},{title:"Technical Support Engineer", meta:"Coimbatore · Full-time"}] 
+    },
+    { 
+      name:"IBM", domain:"ibm.com", 
+      about:"Pioneer in AI technology (Watson), hybrid cloud solutions, quantum computing, and high-impact enterprise technology consulting.", 
+      url:"https://www.ibm.com/careers",
+      vacancies:[{title:"Application Developer", meta:"Bengaluru · Full-time"},{title:"Data Scientist", meta:"Pune · Full-time"},{title:"Cybersecurity Analyst", meta:"Hyderabad · Full-time"}] 
+    }
+  ];
+
+  function goTo(pageId){
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById(pageId).classList.add('active');
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+
+  function switchTab(tab){
+    document.getElementById('tab-login').classList.toggle('active', tab==='login');
+    document.getElementById('tab-signup').classList.toggle('active', tab==='signup');
+    document.getElementById('form-login').style.display = tab==='login' ? 'block' : 'none';
+    document.getElementById('form-signup').style.display = tab==='signup' ? 'block' : 'none';
+  }
+
+  function doLogin(){
+    const email = document.getElementById('login-email').value.trim();
+    const pass = document.getElementById('login-pass').value.trim();
+    const err = document.getElementById('login-error');
+    if(!email || !pass){ err.style.display='block'; return; }
+    err.style.display='none';
+    const name = email.split('@')[0];
+    enterDashboard(name, email);
+  }
+
+  function doSignup(){
+    const name = document.getElementById('signup-name').value.trim();
+    const email = document.getElementById('signup-email').value.trim();
+    const pass = document.getElementById('signup-pass').value.trim();
+    const err = document.getElementById('signup-error');
+    if(!name || !email || !pass){ err.style.display='block'; return; }
+    err.style.display='none';
+    enterDashboard(name, email);
+  }
+
+  function enterDashboard(displayName, email){
+    currentUser.name = displayName;
+    currentUser.email = email;
+
+    document.getElementById('auth-wrap').style.display = 'none';
+    document.getElementById('dashboard').classList.add('active');
+    document.getElementById('user-display').textContent = displayName;
+
+    document.getElementById('modal-user-name').textContent = displayName;
+    document.getElementById('modal-user-email').textContent = email;
+
+    renderCompanies(companies);
+  }
+
+  function doLogout(){
+    document.getElementById('dashboard').classList.remove('active');
+    document.getElementById('auth-wrap').style.display = 'flex';
+    document.getElementById('login-email').value='';
+    document.getElementById('login-pass').value='';
+    switchTab('login');
+  }
+
+  function toggleProfileModal(show){
+    const modal = document.getElementById('profileModal');
+    if(show) modal.classList.add('active');
+    else modal.classList.remove('active');
+  }
+
+  function handleApply(targetUrl){
+    window.open(targetUrl, '_blank');
+  }
+
+  function renderCompanies(list){
+    const grid = document.getElementById('company-grid');
+    grid.innerHTML = '';
+    list.forEach((c) => {
+      const card = document.createElement('div');
+      card.className = 'company-card';
+      const logoUrl = `https://www.google.com/s2/favicons?domain=${c.domain}&sz=128`;
+      card.innerHTML = `
+        <div class="company-top">
+          <div class="company-img-wrap">
+            <img src="${logoUrl}" alt="${c.name} Logo" onerror="this.src='https://via.placeholder.com/48?text=${c.name[0]}'">
+          </div>
+          <div>
+            <div class="company-name">${c.name}</div>
+            <div class="company-open"><span class="dot-live" style="width:6px;height:6px;"></span> ${c.vacancies.length} open positions</div>
+          </div>
+        </div>
+        <div class="company-about">${c.about}</div>
+        <div class="vacancy-toggle" onclick="toggleCard(this)"><span>View openings</span> <span class="chevron">▾</span></div>
+        <div class="vacancy-list">
+          ${c.vacancies.map(v => `
+            <div class="vacancy-item">
+              <div class="vac-info"><b>${v.title}</b><span>${v.meta}</span></div>
+              <span class="apply-link" onclick="handleApply('${c.url}')">Apply →</span>
+            </div>
+          `).join('')}
+        </div>
+      `;
+      grid.appendChild(card);
+    });
+  }
+
+  function toggleCard(el){
+    el.closest('.company-card').classList.toggle('open');
+  }
+
+  /* LOCALSTORAGE REVIEWS MANAGEMENT */
+  function getStoredReviews() {
+    const saved = localStorage.getItem('jobfusion_all_reviews');
+    return saved ? JSON.parse(saved) : initialDefaultReviews;
+  }
+
+  function renderReviews() {
+    const allReviews = getStoredReviews();
+    const container = document.getElementById('reviewsContainer');
+    container.innerHTML = '';
+
+    allReviews.forEach(r => {
+      const card = document.createElement('div');
+      card.className = 'review-card fade-in';
+      card.setAttribute('data-id', r.id);
+
+      const deleteBtnHTML = r.isDefault ? '' : `<button class="delete-btn" onclick="deleteOpinion('${r.id}')">🗑️ Delete Review</button>`;
+
+      card.innerHTML = `
+        <div class="review-card-top">
+          <div class="user-info">
+            <div class="user-avatar">👤</div>
+            <div class="user-details">
+              <h4>${r.name}</h4>
+              <div class="user-role">${r.role}</div>
+              <div class="post-time">${r.time}</div>
+            </div>
+          </div>
+          <span class="user-badge">Verified Applicant</span>
+        </div>
+        <div class="rating-stars" style="margin-bottom:10px;">${r.stars || '★★★★★'}</div>
+        <p>"${r.text}"</p>
+        ${deleteBtnHTML ? `<div class="review-actions">${deleteBtnHTML}</div>` : ''}
+      `;
+      container.appendChild(card);
+    });
+
+    document.getElementById('totalReviewsCount').textContent = `(${allReviews.length}+ Reviews)`;
+  }
+
+  function submitOpinion(){
+    const input = document.getElementById('opinion-text');
+    const text = input.value.trim();
+    if(!text){
+      alert('Please write something before posting!');
+      return;
+    }
+
+    const now = new Date();
+    const formattedDate = now.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+    const formattedTime = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    
+    const newReview = {
+      id: 'rev_' + Date.now(),
+      name: currentUser.name,
+      role: 'Software Engineering Applicant',
+      time: `Posted on ${formattedDate} at ${formattedTime}`,
+      stars: '★★★★★',
+      text: text,
+      isDefault: false
+    };
+
+    const currentReviews = getStoredReviews();
+    currentReviews.unshift(newReview);
+    localStorage.setItem('jobfusion_all_reviews', JSON.stringify(currentReviews));
+
+    renderReviews();
+    input.value = '';
+
+    goTo('page-landing');
+    setTimeout(() => {
+      document.getElementById('reviews').scrollIntoView({ behavior: 'smooth' });
+    }, 200);
+  }
+
+  function deleteOpinion(id){
+    if(confirm("Are you sure you want to delete this opinion record?")){
+      let currentReviews = getStoredReviews();
+      currentReviews = currentReviews.filter(r => r.id !== id);
+      localStorage.setItem('jobfusion_all_reviews', JSON.stringify(currentReviews));
+      renderReviews();
+    }
+  }
+
+  // SPOTLIGHT & RIPPLE
+  const spotlight = document.getElementById('spotlight');
+  document.addEventListener('mousemove', (e) => {
+    spotlight.style.left = e.clientX + 'px';
+    spotlight.style.top = e.clientY + 'px';
+  });
+
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('.btn');
+    if(!btn) return;
+    const rect = btn.getBoundingClientRect();
+    const ripple = document.createElement('span');
+    ripple.className = 'ripple';
+    const size = Math.max(rect.width, rect.height);
+    ripple.style.width = ripple.style.height = size + 'px';
+    ripple.style.left = (e.clientX - rect.left - size/2) + 'px';
+    ripple.style.top = (e.clientY - rect.top - size/2) + 'px';
+    btn.appendChild(ripple);
+    setTimeout(() => ripple.remove(), 600);
+  });
+
+  // COUNTER ANIMATION
+  function animateCounters(){
+    document.querySelectorAll('.counter').forEach(el => {
+      const target = parseInt(el.getAttribute('data-target'), 10);
+      const suffix = el.getAttribute('data-suffix') || '';
+      let current = 0;
+      const duration = 1400;
+      const stepTime = 16;
+      const steps = duration / stepTime;
+      const increment = target / steps;
+      const tick = () => {
+        current += increment;
+        if(current >= target){
+          el.textContent = target.toLocaleString() + suffix;
+        } else {
+          el.textContent = Math.floor(current).toLocaleString() + suffix;
+          requestAnimationFrame(() => setTimeout(tick, stepTime));
+        }
+      };
+      tick();
+    });
+  }
+
+  const numbersSection = document.getElementById('numbers');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if(entry.isIntersecting){
+        animateCounters();
+        observer.disconnect();
+      }
+    });
+  }, {threshold:0.3});
+  observer.observe(numbersSection);
+
+  // INITIALIZE REVIEWS ON LOAD
+  window.addEventListener('DOMContentLoaded', () => {
+    renderReviews();
+  });
+</script>
+</body>
+</html>
