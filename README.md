@@ -4,9 +4,9 @@
 
 <div align="center">
 
-# 💼 JOB Fusion
+# 💼 JOBFusion 
 
-### 🚀 `Find • Explore • Apply`
+### `Find // Explore // Apply`
 
 <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=22&pause=1000&color=00D9FF&center=true&vCenter=true&width=600&lines=Your+Smart+Job+Search+Platform;Find+Jobs+From+Multiple+Companies;Simple+%7C+Fast+%7C+Professional;Built+With+HTML+CSS+JavaScript" />
 
@@ -20,7 +20,7 @@
 
 ---
 
-## 🌐 About JOB Fusion
+##🌐ABOUT JOBFusion
 
 > 💡 **JOB Fusion** is a modern job-search platform that brings
 > opportunities from multiple companies together in one place.
@@ -43,7 +43,7 @@ It helps students and job seekers:
 
 <td width="50%">
 
-### 🔎 Easy Job Search
+### 🔎EASY JOB SEARCH
 
 Search and discover suitable jobs quickly.
 
@@ -63,7 +63,7 @@ Explore opportunities from different companies.
 
 <td>
 
-### ⚡ Quick Application
+### ⚡QUICK APPLICAQT...
 
 Get direct access to application pages.
 
@@ -102,7 +102,7 @@ Works across mobile, tablet and desktop.
 
 ---
 
-# 🛠️ Tech Stack
+# 🛠️Tech Stack
 
 <div align="center">
 
@@ -123,14 +123,14 @@ Works across mobile, tablet and desktop.
 
 ---
 
-# 🚀 Featured Projects
+# 🚀Featured Projects
 
 <table>
 <tr>
 
 <td width="33%" align="center">
 
-## 💼 JOB Fusion
+## 💼JOBFusion
 
 **Featured Project**
 
@@ -140,7 +140,7 @@ A modern job-search platform designed to help users discover jobs from multiple 
 
 `HTML` `CSS` `JavaScript` `Bootstrap`
 
-⭐ **Featured**
+⭐**Featured**
 
 </td>
 
@@ -160,7 +160,7 @@ A professional developer portfolio website to showcase skills, projects and achi
 
 <td width="33%" align="center">
 
-## 📝 Notes App
+## 📝Notes App
 
 A simple and responsive notes application for creating and managing notes.
 
@@ -177,11 +177,12 @@ A simple and responsive notes application for creating and managing notes.
 
 ---
 
-# 🔄 How JOB Fusion Works
+# 🔄 How JOBFusion Works
 
-<div align="center">
+<div align="center"> 
+```text  
 
-```text
+       
        👤 USER
           │
           ▼
@@ -191,7 +192,7 @@ A simple and responsive notes application for creating and managing notes.
     🏢 EXPLORE JOBS
           │
           ▼
-     🎯 SELECT JOB
+     🎯SELECT JOB
           │
           ▼
     📄 VIEW DETAILS
@@ -200,4 +201,4 @@ A simple and responsive notes application for creating and managing notes.
  🔗 OFFICIAL WEBSITE
           │
           ▼
-       🚀 APPLY
+       🚀 APPLLE
